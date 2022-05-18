@@ -4,6 +4,9 @@ services:
     arguments: ['@variation_cache.flexible_permissions', '@variation_cache.flexible_permissions_memory', '@cache.flexible_permissions_memory', '@account_switcher']
     tags:
       - { name: 'service_collector', call: 'addCalculator', tag: 'flexible_permission_calculator' }
+  flexible_permissions.checker:
+    class: 'Drupal\flexible_permissions\PermissionChecker'
+    arguments: ['@flexible_permissions.chain_calculator']
 
   # Define persistent and memory caches for storing the calculated permissions.
   cache.flexible_permissions:
