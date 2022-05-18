@@ -9,7 +9,7 @@ services:
   cache.flexible_permissions:
     class: 'Drupal\Core\Cache\CacheBackendInterface'
     factory: 'cache_factory:get'
-    arguments: ['flexible_permission']
+    arguments: ['flexible_permissions']
     tags:
       - { name: 'cache.bin' }
   cache.flexible_permissions_memory:
