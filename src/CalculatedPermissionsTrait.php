@@ -39,6 +39,13 @@ trait CalculatedPermissionsTrait {
   /**
    * {@inheritdoc}
    */
+  public function getScopes() {
+    return array_keys($this->items);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getItemsByScope($scope) {
     return isset($this->items[$scope])
       ? array_values($this->items[$scope])

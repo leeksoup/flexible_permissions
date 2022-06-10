@@ -21,6 +21,7 @@ class CalculatedPermissionsTest extends UnitTestCase {
    * @covers ::__construct
    * @covers ::getItem
    * @covers ::getItems
+   * @covers ::getScopes
    * @covers ::getItemsByScope
    */
   public function testConstructor() {
@@ -37,6 +38,7 @@ class CalculatedPermissionsTest extends UnitTestCase {
     $this->assertSame($item_a, $calculated_permissions->getItem('scope_a', 'foo'), 'Managed to retrieve the calculated permissions item by scope and identifier.');
     $this->assertFalse($calculated_permissions->getItem('scope_a', '404-id-not-found'), 'Requesting a non-existent identifier fails correctly.');
     $this->assertSame([$item_a, $item_b], $calculated_permissions->getItems(), 'Successfully retrieved all items regardless of scope.');
+    $this->assertSame(['scope_a', 'scope_b'], $calculated_permissions->getScopes(), 'Successfully retrieved all scopes.');
     $this->assertSame([$item_a], $calculated_permissions->getItemsByScope('scope_a'), 'Successfully retrieved all items by scope.');
 
     $this->assertSame(['24'], $calculated_permissions->getCacheTags(), 'Successfully inherited all cache tags.');

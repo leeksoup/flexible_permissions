@@ -134,7 +134,17 @@ class ChainPermissionCalculator implements ChainPermissionCalculatorInterface {
     else {
       $calculated_permissions = new RefinableCalculatedPermissions();
       foreach ($this->getCalculators() as $calculator) {
-        $calculated_permissions = $calculated_permissions->merge($calculator->calculatePermissions($account, $scope));
+        $calculator_permissions = $calculator->calculatePermissions($account, $scope);
+        $calculator_scopes = $calculator_permissions->getScopes();
+
+        // Validate that only the requested scope was returned. An empty result
+        // is allowed, however, as it might be that the calculator had nothing
+        // to say for this scope.
+        if (!empty($calculator_scopes) && (count($calculator_scopes) > 1 || reset($calculator_scopes) !== $scope)) {
+          throw new CalculatedPermissionsScopeException(sprintf('The calculator "%s" returned permissions for scopes other than "%s".', get_class($calculator), $scope));
+        }
+
+        $calculated_permissions = $calculated_permissions->merge($calculator_permissions);
       }
 
       // Apply a cache tag to easily flush the calculated permissions.
