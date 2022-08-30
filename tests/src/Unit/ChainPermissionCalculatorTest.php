@@ -15,8 +15,6 @@ use Drupal\flexible_permissions\RefinableCalculatedPermissions;
 use Drupal\Tests\UnitTestCase;
 use Drupal\variationcache\Cache\VariationCacheInterface;
 use Prophecy\Argument;
-use Prophecy\Prophecy\MethodProphecy;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -24,8 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @coversDefaultClass \Drupal\flexible_permissions\ChainPermissionCalculator
  * @group flexible_permissions
- *
- * @todo Test other methods and caching.
  */
 class ChainPermissionCalculatorTest extends UnitTestCase {
 
@@ -258,6 +254,7 @@ class ChainPermissionCalculatorTest extends UnitTestCase {
     ];
     return $cases;
   }
+
   /**
    * Sets up the chain calculator.
    *
