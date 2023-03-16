@@ -7,8 +7,6 @@ namespace Drupal\flexible_permissions;
  *
  * Each calculator in the chain can be another chain, which is why this
  * interface extends the permission calculator one.
- *
- * @todo Add alterPermissions($permissions, $account, $scope)?
  */
 interface ChainPermissionCalculatorInterface extends PermissionCalculatorInterface {
 

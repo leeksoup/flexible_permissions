@@ -15,9 +15,25 @@ class RefinableCalculatedPermissions implements RefinableCalculatedPermissionsIn
   use RefinableCacheableDependencyTrait;
 
   /**
+   * Whether the object is currently building permissions.
+   *
+   * @var bool
+   */
+  protected $buildMode = TRUE;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function disableBuildMode() {
+    $this->buildMode = FALSE;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function addItem(CalculatedPermissionsItemInterface $item, $overwrite = FALSE) {
+    // Only allow overwriting when not in build mode.
+    $overwrite = $overwrite && !$this->buildMode;
     if (!$overwrite && $existing = $this->getItem($item->getScope(), $item->getIdentifier())) {
       $item = $this->mergeItems($existing, $item);
     }
@@ -29,7 +45,9 @@ class RefinableCalculatedPermissions implements RefinableCalculatedPermissionsIn
    * {@inheritdoc}
    */
   public function removeItem($scope, $identifier) {
-    unset($this->items[$scope][$identifier]);
+    if (!$this->buildMode) {
+      unset($this->items[$scope][$identifier]);
+    }
     return $this;
   }
 
@@ -37,7 +55,9 @@ class RefinableCalculatedPermissions implements RefinableCalculatedPermissionsIn
    * {@inheritdoc}
    */
   public function removeItems() {
-    $this->items = [];
+    if (!$this->buildMode) {
+      $this->items = [];
+    }
     return $this;
   }
 
@@ -45,7 +65,9 @@ class RefinableCalculatedPermissions implements RefinableCalculatedPermissionsIn
    * {@inheritdoc}
    */
   public function removeItemsByScope($scope) {
-    unset($this->items[$scope]);
+    if (!$this->buildMode) {
+      unset($this->items[$scope]);
+    }
     return $this;
   }
 

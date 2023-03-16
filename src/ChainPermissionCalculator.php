@@ -132,6 +132,7 @@ class ChainPermissionCalculator implements ChainPermissionCalculatorInterface {
     }
     // Otherwise build the permissions and store them in the persistent cache.
     else {
+      // Build mode, allow all calculators to add initial data.
       $calculated_permissions = new RefinableCalculatedPermissions();
       foreach ($this->getCalculators() as $calculator) {
         $calculator_permissions = $calculator->calculatePermissions($account, $scope);
@@ -145,6 +146,14 @@ class ChainPermissionCalculator implements ChainPermissionCalculatorInterface {
         }
 
         $calculated_permissions = $calculated_permissions->merge($calculator_permissions);
+      }
+
+      // Alter mode, allow all calculators to alter the complete build.
+      $calculated_permissions->disableBuildMode();
+      foreach ($this->getCalculators() as $calculator) {
+        if ($calculator instanceof PermissionCalculatorAlterInterface) {
+          $calculator->alterPermissions($calculated_permissions);
+        }
       }
 
       // Apply a cache tag to easily flush the calculated permissions.

@@ -35,13 +35,34 @@ class RefinableCalculatedPermissionsTest extends UnitTestCase {
     $calculated_permissions->addItem($item);
     $this->assertEquals(['bar', 'baz'], $calculated_permissions->getItem($scope, 'foo')->getPermissions(), 'Adding a calculated permissions item that was already in the list merges them.');
 
-    $calculated_permissions->addItem($item, TRUE);
-    $this->assertEquals(['baz'], $calculated_permissions->getItem($scope, 'foo')->getPermissions(), 'Successfully overwrote an item that was already in the list.');
-
     $item = new CalculatedPermissionsItem($scope, 'foo', ['cat'], TRUE);
     $calculated_permissions->addItem($item);
     $this->assertEquals([], $calculated_permissions->getItem($scope, 'foo')->getPermissions(), 'Merging in a calculated permissions item with admin rights empties the permissions.');
     $this->assertTrue($calculated_permissions->getItem($scope, 'foo')->isAdmin(), 'Merging in a calculated permissions item with admin rights flags the result as having admin rights.');
+  }
+
+
+  /**
+   * Tests the overwriting of a calculated permissions item.
+   *
+   * @covers ::addItem
+   * @covers ::getItem
+   * @depends testAddItem
+   */
+  public function testAddItemOverwrite() {
+    $calculated_permissions = new RefinableCalculatedPermissions();
+    $scope = 'some_scope';
+
+    $item = new CalculatedPermissionsItem($scope, 'foo', ['bar']);
+    $calculated_permissions->addItem($item);
+
+    $item = new CalculatedPermissionsItem($scope, 'foo', ['baz']);
+    $calculated_permissions->addItem($item, TRUE);
+    $this->assertEquals(['bar', 'baz'], $calculated_permissions->getItem($scope, 'foo')->getPermissions(), 'Could not overwrite item in build mode.');
+
+    $calculated_permissions->disableBuildMode();
+    $calculated_permissions->addItem($item, TRUE);
+    $this->assertEquals(['baz'], $calculated_permissions->getItem($scope, 'foo')->getPermissions(), 'Successfully overwrote an item that was already in the list.');
   }
 
   /**
@@ -55,10 +76,13 @@ class RefinableCalculatedPermissionsTest extends UnitTestCase {
     $item = new CalculatedPermissionsItem($scope, 'foo', ['bar']);
 
     $calculated_permissions = new RefinableCalculatedPermissions();
-    $calculated_permissions
-      ->addItem($item)
-      ->removeItem($scope, 'foo');
+    $calculated_permissions->addItem($item);
 
+    $calculated_permissions->removeItem($scope, 'foo');
+    $this->assertNotFalse($calculated_permissions->getItem($scope, 'foo'), 'Could not remove item in build mode.');
+
+    $calculated_permissions->disableBuildMode();
+    $calculated_permissions->removeItem($scope, 'foo');
     $this->assertFalse($calculated_permissions->getItem($scope, 'foo'), 'Could not retrieve a removed item.');
   }
 
@@ -73,10 +97,13 @@ class RefinableCalculatedPermissionsTest extends UnitTestCase {
     $item = new CalculatedPermissionsItem($scope, 'foo', ['bar']);
 
     $calculated_permissions = new RefinableCalculatedPermissions();
-    $calculated_permissions
-      ->addItem($item)
-      ->removeItems();
+    $calculated_permissions->addItem($item);
 
+    $calculated_permissions->removeItems();
+    $this->assertNotFalse($calculated_permissions->getItem($scope, 'foo'), 'Could not remove items in build mode.');
+
+    $calculated_permissions->disableBuildMode();
+    $calculated_permissions->removeItems();
     $this->assertFalse($calculated_permissions->getItem($scope, 'foo'), 'Could not retrieve a removed item.');
   }
 
@@ -98,7 +125,10 @@ class RefinableCalculatedPermissionsTest extends UnitTestCase {
       ->addItem($item_a)
       ->addItem($item_b)
       ->removeItemsByScope($scope_a);
+    $this->assertNotFalse($calculated_permissions->getItem($scope_a, 'foo'), 'Could not remove items in build mode.');
 
+    $calculated_permissions->disableBuildMode();
+    $calculated_permissions->removeItemsByScope($scope_a);
     $this->assertFalse($calculated_permissions->getItem($scope_a, 'foo'), 'Could not retrieve a removed item.');
     $this->assertNotFalse($calculated_permissions->getItem($scope_b, 1), 'Untouched scope item was found.');
   }

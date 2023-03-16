@@ -12,6 +12,7 @@ use Drupal\flexible_permissions\CalculatedPermissionsScopeException;
 use Drupal\flexible_permissions\ChainPermissionCalculator;
 use Drupal\flexible_permissions\PermissionCalculatorBase;
 use Drupal\flexible_permissions\RefinableCalculatedPermissions;
+use Drupal\flexible_permissions\RefinableCalculatedPermissionsInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\variationcache\Cache\VariationCacheInterface;
 use Prophecy\Argument;
@@ -47,8 +48,13 @@ class ChainPermissionCalculatorTest extends UnitTestCase {
    */
   public function testAddCalculator() {
     $chain_calculator = $this->setUpChainCalculator();
+    $calculators = [
+      new FooScopeCalculator(),
+      new BarScopeCalculator(),
+      new BarAlterCalculator(),
+    ];
 
-    foreach ($calculators = [new BarScopeCalculator(), new FooScopeCalculator()] as $calculator) {
+    foreach ($calculators as $calculator) {
       $chain_calculator->addCalculator($calculator);
     }
 
@@ -62,15 +68,12 @@ class ChainPermissionCalculatorTest extends UnitTestCase {
    */
   public function testGetPersistentCacheContexts() {
     $chain_calculator = $this->setUpChainCalculator();
-    $persistent_cache_contexts = [];
 
-    foreach ([new FooScopeCalculator(), new BarScopeCalculator()] as $calculator) {
-      $persistent_cache_contexts = array_merge($persistent_cache_contexts, $calculator->getPersistentCacheContexts('baz'));
+    foreach ([new FooScopeCalculator(), new BarScopeCalculator(), new BarAlterCalculator()] as $calculator) {
       $chain_calculator->addCalculator($calculator);
     }
 
-    $calculator_contexts = $chain_calculator->getPersistentCacheContexts('baz');
-    $this->assertEquals($persistent_cache_contexts, $calculator_contexts, 'Cache contexts match!');
+    $this->assertEquals(['foo', 'bar', 'baz'], $chain_calculator->getPersistentCacheContexts('anything'), 'Cache contexts match!');
   }
 
   /**
@@ -87,8 +90,27 @@ class ChainPermissionCalculatorTest extends UnitTestCase {
 
     $calculator_permissions = $calculator->calculatePermissions($account, 'bar');
     $calculator_permissions->addCacheTags(['flexible_permissions']);
-    $calculated_permissions = $chain_calculator->calculatePermissions($account, 'bar');
-    $this->assertEquals(new CalculatedPermissions($calculator_permissions), $calculated_permissions);
+    $this->assertEquals(new CalculatedPermissions($calculator_permissions), $chain_calculator->calculatePermissions($account, 'bar'));
+  }
+
+  /**
+   * Tests that calculators can alter the final result.
+   *
+   * @covers ::calculatePermissions
+   */
+  public function testAlterPermissions() {
+    $account = $this->prophesize(AccountInterface::class)->reveal();
+
+    $chain_calculator = $this->setUpChainCalculator();
+    $chain_calculator->addCalculator(new BarScopeCalculator());
+    $chain_calculator->addCalculator(new BarAlterCalculator());
+
+    $actual_permissions = $chain_calculator
+      ->calculatePermissions($account, 'bar')
+      ->getItem('bar', 1)
+      ->getPermissions();
+
+    $this->assertEquals(['foo', 'baz'], $actual_permissions);
   }
 
   /**
@@ -209,6 +231,7 @@ class ChainPermissionCalculatorTest extends UnitTestCase {
     $bar_calculator = new BarScopeCalculator();
     $bar_permissions = $bar_calculator->calculatePermissions($account, $scope);
     $bar_permissions->addCacheTags(['flexible_permissions']);
+    $bar_permissions->disableBuildMode();
     $none_refinable_bar_permissions = new CalculatedPermissions($bar_permissions);
 
     $cache_static = $this->prophesize(VariationCacheInterface::class);
@@ -305,7 +328,7 @@ class FooScopeCalculator extends PermissionCalculatorBase {
 
   public function calculatePermissions(AccountInterface $account, $scope) {
     $calculated_permissions = parent::calculatePermissions($account, $scope);
-    return $calculated_permissions->addItem(new CalculatedPermissionsItem('foo', 1, [], TRUE));
+    return $calculated_permissions->addItem(new CalculatedPermissionsItem('foo', 1, ['foo', 'bar'], TRUE));
   }
 
   public function getPersistentCacheContexts($scope) {
@@ -318,11 +341,39 @@ class BarScopeCalculator extends PermissionCalculatorBase {
 
   public function calculatePermissions(AccountInterface $account, $scope) {
     $calculated_permissions = parent::calculatePermissions($account, $scope);
-    return $calculated_permissions->addItem(new CalculatedPermissionsItem('bar', 1, [], TRUE));
+    return $calculated_permissions->addItem(new CalculatedPermissionsItem('bar', 1, ['foo', 'bar']));
   }
 
   public function getPersistentCacheContexts($scope) {
     return ['bar'];
+  }
+
+}
+
+class BarAlterCalculator extends PermissionCalculatorBase {
+
+  public function alterPermissions(RefinableCalculatedPermissionsInterface $calculated_permissions) {
+    parent::alterPermissions($calculated_permissions);
+
+    foreach ($calculated_permissions->getItemsByScope('bar') as $item) {
+      $permissions = $item->getPermissions();
+
+      if (($key = array_search('bar', $permissions, TRUE)) !== FALSE) {
+        $permissions[$key] = 'baz';
+
+        $new_item = new CalculatedPermissionsItem(
+          $item->getScope(),
+          $item->getIdentifier(),
+          $permissions
+        );
+
+        $calculated_permissions->addItem($new_item, TRUE);
+      }
+    }
+  }
+
+  public function getPersistentCacheContexts($scope) {
+    return ['baz'];
   }
 
 }

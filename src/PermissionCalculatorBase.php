@@ -7,7 +7,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Base class for permission calculators.
  */
-abstract class PermissionCalculatorBase implements PermissionCalculatorInterface {
+abstract class PermissionCalculatorBase implements PermissionCalculatorAlterInterface, PermissionCalculatorInterface {
 
   /**
    * {@inheritdoc}
@@ -15,6 +15,11 @@ abstract class PermissionCalculatorBase implements PermissionCalculatorInterface
   public function calculatePermissions(AccountInterface $account, $scope) {
     return (new RefinableCalculatedPermissions())->addCacheContexts($this->getPersistentCacheContexts($scope));
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alterPermissions(RefinableCalculatedPermissionsInterface $calculated_permissions) {}
 
   /**
    * {@inheritdoc}
