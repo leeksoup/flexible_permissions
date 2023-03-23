@@ -22,7 +22,7 @@
   "license": "GPL-2.0-or-later",
   "minimum-stability": "dev",
   "require": {
-    "drupal/core": "^9 || ^10",
+    "drupal/core": "^9.5 || ^10",
     "drupal/variationcache": "^1.0"
   }
 }
