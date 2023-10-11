@@ -27,7 +27,7 @@ interface PermissionCalculatorInterface {
    * Calculates the permissions for an account within a given scope.
    *
    * @param \Drupal\Core\Session\AccountInterface $account
-   *   The user account for which to calculate the outsider permissions.
+   *   The user account for which to calculate the permissions.
    * @param string $scope
    *   The scope to calculate the permissions for.
    *
