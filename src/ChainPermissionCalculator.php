@@ -151,7 +151,10 @@ class ChainPermissionCalculator implements ChainPermissionCalculatorInterface {
       // Alter mode, allow all calculators to alter the complete build.
       $calculated_permissions->disableBuildMode();
       foreach ($this->getCalculators() as $calculator) {
-        if ($calculator instanceof PermissionCalculatorAlterInterface) {
+        if ($calculator instanceof PermissionCalculatorAlterInterfaceV2) {
+          $calculator->alterPermissions($account, $scope, $calculated_permissions);
+        }
+        elseif ($calculator instanceof PermissionCalculatorAlterInterface) {
           $calculator->alterPermissions($calculated_permissions);
         }
       }
