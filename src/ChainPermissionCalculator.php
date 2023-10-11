@@ -201,8 +201,9 @@ class ChainPermissionCalculator implements ChainPermissionCalculatorInterface {
     else {
       $contexts = [];
       foreach ($this->getCalculators() as $calculator) {
-        $contexts = array_merge($contexts, $calculator->getPersistentCacheContexts($scope));
+        $contexts[] = $calculator->getPersistentCacheContexts($scope);
       }
+      $contexts = array_merge(...$contexts);
 
       // Store the contexts in the regular static cache.
       $this->regularStatic->set($cid, $contexts);
