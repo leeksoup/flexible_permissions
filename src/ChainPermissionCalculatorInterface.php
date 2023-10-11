@@ -15,8 +15,6 @@ interface ChainPermissionCalculatorInterface extends PermissionCalculatorInterfa
    *
    * @param \Drupal\flexible_permissions\PermissionCalculatorInterface $calculator
    *   The calculator.
-   *
-   * @return mixed
    */
   public function addCalculator(PermissionCalculatorInterface $calculator);
 

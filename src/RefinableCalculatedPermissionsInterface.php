@@ -38,9 +38,9 @@ interface RefinableCalculatedPermissionsInterface extends RefinableCacheableDepe
    *
    * Does nothing if build mode is still enabled.
    *
-   * @param $scope
+   * @param string $scope
    *   The scope name to remove the item from.
-   * @param $identifier
+   * @param string|int $identifier
    *   The scope identifier to remove the item from.
    *
    * @return $this

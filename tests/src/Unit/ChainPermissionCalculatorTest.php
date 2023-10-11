@@ -282,6 +282,7 @@ class ChainPermissionCalculatorTest extends UnitTestCase {
    * Sets up the chain calculator.
    *
    * @return \Drupal\flexible_permissions\ChainPermissionCalculatorInterface
+   *   The chain calculator.
    */
   protected function setUpChainCalculator(
     VariationCacheInterface $variation_cache = NULL,
@@ -324,34 +325,58 @@ class ChainPermissionCalculatorTest extends UnitTestCase {
 
 }
 
+/**
+ * Test class that only calculates.
+ */
 class FooScopeCalculator extends PermissionCalculatorBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function calculatePermissions(AccountInterface $account, $scope) {
     $calculated_permissions = parent::calculatePermissions($account, $scope);
     return $calculated_permissions->addItem(new CalculatedPermissionsItem('foo', 1, ['foo', 'bar'], TRUE));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getPersistentCacheContexts($scope) {
     return ['foo'];
   }
 
 }
 
+/**
+ * Test class that only calculates.
+ */
 class BarScopeCalculator extends PermissionCalculatorBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function calculatePermissions(AccountInterface $account, $scope) {
     $calculated_permissions = parent::calculatePermissions($account, $scope);
     return $calculated_permissions->addItem(new CalculatedPermissionsItem('bar', 1, ['foo', 'bar']));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getPersistentCacheContexts($scope) {
     return ['bar'];
   }
 
 }
 
+/**
+ * Test class that only alters.
+ */
 class BarAlterCalculator extends PermissionCalculatorBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function alterPermissions(RefinableCalculatedPermissionsInterface $calculated_permissions) {
     parent::alterPermissions($calculated_permissions);
 
@@ -372,29 +397,56 @@ class BarAlterCalculator extends PermissionCalculatorBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getPersistentCacheContexts($scope) {
     return ['baz'];
   }
 
 }
 
+/**
+ * Test class that does nothing.
+ */
 class EmptyCalculator extends PermissionCalculatorBase {
 
 }
 
+/**
+ * Test class that only adds a cache context.
+ */
 class UserContextCalculator extends PermissionCalculatorBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getPersistentCacheContexts($scope) {
     return ['user'];
   }
 
 }
 
+/**
+ * Test class representing a cache entry.
+ */
 class CacheItem {
 
+  /**
+   * The cache item's data.
+   *
+   * @var mixed
+   */
   public $data;
 
+  /**
+   * Constructs a new CacheItem object.
+   *
+   * @param mixed $data
+   *   Any data to assign to the fake cache item.
+   */
   public function __construct($data) {
     $this->data = $data;
   }
+
 }
