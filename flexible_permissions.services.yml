@@ -24,11 +24,11 @@ services:
 
   # Build a variation cache on top of them to handle cache redirects.
   variation_cache.flexible_permissions:
-    class: 'Drupal\variationcache\Cache\VariationCacheInterface'
+    class: 'Drupal\Core\Cache\VariationCacheInterface'
     factory: 'variation_cache_factory:get'
     arguments: ['flexible_permissions']
   variation_cache.flexible_permissions_memory:
-    class: 'Drupal\variationcache\Cache\VariationCacheInterface'
+    class: 'Drupal\Core\Cache\VariationCacheInterface'
     factory: 'variation_cache_factory:get'
     arguments: ['flexible_permissions_memory']
 

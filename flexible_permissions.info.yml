@@ -2,5 +2,5 @@ name: 'Flexible permissions'
 description: 'Allows you to gather, calculate and cache permissions from a myriad of sources'
 type: 'module'
 core_version_requirement: ^9.5 || ^10
-dependencies:
-  - 'variationcache:variationcache'
+#dependencies:
+#  - 'variationcache:variationcache'

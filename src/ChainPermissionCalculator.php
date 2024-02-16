@@ -6,7 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
-use Drupal\variationcache\Cache\VariationCacheInterface;
+use Drupal\Core\Cache\VariationCacheInterface;
 
 /**
  * Collects permissions for an account.
@@ -23,14 +23,14 @@ class ChainPermissionCalculator implements ChainPermissionCalculatorInterface {
   /**
    * The variation cache backend to use as a persistent cache.
    *
-   * @var \Drupal\variationcache\Cache\VariationCacheInterface
+   * @var \Drupal\Core\Cache\VariationCacheInterface
    */
   protected $cache;
 
   /**
    * The variation cache backend to use as a static cache.
    *
-   * @var \Drupal\variationcache\Cache\VariationCacheInterface
+   * @var \Drupal\Core\Cache\VariationCacheInterface
    */
   protected $static;
 
@@ -51,9 +51,9 @@ class ChainPermissionCalculator implements ChainPermissionCalculatorInterface {
   /**
    * Constructs a ChainPermissionCalculator object.
    *
-   * @param \Drupal\variationcache\Cache\VariationCacheInterface $cache
+   * @param \Drupal\Core\Cache\VariationCacheInterface $cache
    *   The variation cache to use as a persistent cache.
-   * @param \Drupal\variationcache\Cache\VariationCacheInterface $static
+   * @param \Drupal\Core\Cache\VariationCacheInterface $static
    *   The variation cache to use as a static cache.
    * @param \Drupal\Core\Cache\CacheBackendInterface $regular_static
    *   The regular cache backend to use as a static cache.
