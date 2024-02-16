@@ -14,7 +14,7 @@ use Drupal\flexible_permissions\PermissionCalculatorBase;
 use Drupal\flexible_permissions\RefinableCalculatedPermissions;
 use Drupal\flexible_permissions\RefinableCalculatedPermissionsInterface;
 use Drupal\Tests\UnitTestCase;
-use Drupal\variationcache\Cache\VariationCacheInterface;
+use Drupal\Core\Cache\VariationCacheInterface;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
